@@ -55,9 +55,9 @@ thirdauthoremail@gatech.edu}
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
-Recent advancements in large language models (LLMs) have set unprecedented benchmarks in sentiment analysis, but their exceptional performance often comes at the cost of significant computational resources. This project investigates the viability of a lightweight, fine-tuned deep learning model capable of running on modest hardware, as a cost-effective alternative to models like BERT and GPT. Using IMDb’s movie review dataset, we evaluate the performance of a 135M-parameter small LLM, “SmolLM,” leveraging few-shot learning and fine-tuning to improve its sentiment analysis capabilities.
+Recent advancements in large language models (LLMs) have set unprecedented benchmarks in sentiment analysis, but their exceptional performance often comes at the cost of significant computational resources. This project investigates the viability of a lightweight, fine-tuned deep learning model capable of running on modest hardware, as a cost-effective alternative to models like BERT and GPT. Using IMDb’s movie review dataset \cite{IMDB-dataset}, we evaluate the performance of a 135M-parameter small LLM, “SmolLM,” leveraging few-shot learning and fine-tuning to improve its sentiment analysis capabilities.
 
-The project benchmarks SmolLM against state-of-the-art LLMs, non-transformer deep learning networks such as CNNs and LSTMs, and traditional machine learning approaches like Logistic Regression, Naive Bayes, and Random Forests. Performance metrics are derived from existing literature on this well-studied dataset.
+The project benchmarks SmolLM against state-of-the-art LLMs, non-transformer deep learning networks such as CNNs and LSTMs, and traditional machine learning approaches like Logistic Regression, Naive Bayes, and Random Forests. Performance metrics are derived from internal experimentation as well as from existing literature on this well-studied dataset.
 
 Our goal is to demonstrate how fine-tuned small models can offer a competitive alternative to traditional methods and larger LLMs for relatively simple NLP tasks. In addition, we explore the diminishing returns of computationally intensive models, highlighting the potential to reduce deployment and operational costs without sacrificing performance. The outcomes of this work aim to guide practitioners in balancing accuracy with resource efficiency in sentiment analysis tasks.
 
@@ -65,6 +65,7 @@ Our goal is to demonstrate how fine-tuned small models can offer a competitive a
 
 %%%%%%%%% BODY TEXT
 \section{Introduction/Background/Motivation}
+This project aims to compare the performance and computational costs of small and large language models for sentiment analysis on the IMDb movie reviews dataset \cite{IMDB-dataset}. The objective is to demonstrate that simpler models, when properly tuned, can deliver competitive performance without the need for expensive computational resources. This project will also explore how the small and large language models compare to traditional machine learning models like naive bayes, logistic regression, and random forest learners. By showcasing the effectiveness of lightweight models, we seek to address the widespread over-reliance on large, resource-intensive models and provide a sufficient and cost effective alternative. 
 
 \textcolor{red}{(5 points) What did you try to do? What problem did you try to solve? Articulate your objectives using absolutely no jargon.} 
 
@@ -74,12 +75,20 @@ Our goal is to demonstrate how fine-tuned small models can offer a competitive a
 
 \textcolor{red}{(5 points) Who cares? If you are successful, what difference will it make?} 
 
-\textcolor{red}{(5 points) What data did you use? Provide details about your data, specifically choose the most important aspects of your data mentioned \href{https://arxiv.org/abs/1803.09010}{here}. You don’t have to choose all of them, just the most relevant.}
 
-This project aims to compare the performance and computational costs of small and large language models for sentiment analysis on the IMDb movie reviews dataset. The objective is to demonstrate that simpler models, when properly tuned, can deliver competitive performance without the need for expensive computational resources. This project will also explore how the small and large language models compare to traditional machine learning models like naive bayes, logistic regression, and random forest learners. By showcasing the effectiveness of lightweight models, we seek to address the widespread over-reliance on large, resource-intensive models and provide a sufficient and cost effective alternative. 
-%-------------------------------------------------------------------------
+
+
+
+\subsection{Dataset}
+The dataset chosen to test the various models sentiment analysis capabilities was the IMDb's movie Review dataset \cite{IMDB-dataset}. This dataset contains strings of movie reviews, which was pulled from IMDb's website in 2011 making it a sample of the total amount of reviews they store. Each movie review sample is accompanied by the dataset's binary sentiment classification of Positive or Negative. The dataset contains 50000 total samples with 25000 being for training and 25000 for testing with an approximately 50/50 split between Positive and Negative classifications. These specifics of the dataset make it very balanced leading to it being well tested in literature and the perfect benchmark for basic sentiment analysis. 
+
 %------------------------------------------------------------------------
 \section{Approach}
+
+\textbf{Mention the models were run on A100 with 40gb for consistency among tests}
+\textbf{HUGE NOTE, the order of pos vs neg in the asking of sentiment matters alot, first one listed tends to be the default models answer. 
+Models tend to say true more because they see it first in the prompt, but to counter this they do default to negative.}
+
 
 (10 points) What did you do exactly? How did you solve the problem? Why did you think it would be successful? Is anything new in your approach? 
 
@@ -89,6 +98,94 @@ This project aims to compare the performance and computational costs of small an
 
 \section{Experiments and Results}
 
+% To calculate the values of accuracy, recall, specificity, precision, and F-score, you need the confusion matrix or the key components: True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN). Here's how each metric is calculated:
+
+% 1. **Accuracy**: The proportion of correctly classified instances (both positive and negative) out of all instances.
+%    \[
+%    \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+%    \]
+
+% 2. **Recall (Sensitivity)**: The proportion of actual positives correctly identified.
+%    \[
+%    \text{Recall} = \frac{TP}{TP + FN}
+%    \]
+
+% 3. **Specificity**: The proportion of actual negatives correctly identified.
+%    \[
+%    \text{Specificity} = \frac{TN}{TN + FP}
+%    \]
+
+% 4. **Precision**: The proportion of predicted positives that are actually positive.
+%    \[
+%    \text{Precision} = \frac{TP}{TP + FP}
+%    \]
+
+% 5. **F-score**: The harmonic mean of precision and recall, balancing the two.
+%    \[
+%    \text{F-Score} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+%    \]
+
+
+\begin{table*}
+\begin{center}
+% shrinks font as needed to fit the table
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+\hline
+Model & Accuracy & Recall & Specificity & Precision & F-Score & \% Positive & \% Negative & \# Unknown \\
+\hline\hline
+SmolLM2-135M Zero-Shot   & 0.50 & 0.01 & 1.00 & 0.78 & 0.02 & 00.78\%  & 99.22\% & 2993  \\
+
+SmolLM2-360M Zero-Shot   & 0.56 & 1.00 & 0.11 & 0.53 & 0.69 & 94.26\% & 05.74\%  & 2     \\
+
+SmolLM2-1.7B ~ Zero-Shot & 0.72 & 0.99 & 0.45 & 0.65 & 0.78 & 77.01\% & 22.99\% & 14    \\
+
+SmolLM2-135M Few-Shot    & 0.59 & 0.80 & 0.37 & 0.56 & 0.66 & 71.86\% & 28.14\% & 0     \\
+
+SmolLM2-360M Few-Shot    & 0.66 & 0.99 & 0.33 & 0.60 & 0.75 & 82.74\% & 17.26\% & 0     \\
+
+SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% & 0     \\
+\hline
+\end{tabular}
+}
+\end{center}
+\caption{Default SmolLM2 Model's Results on Test Dataset}
+\label{tab:contributions}
+\end{table*}
+
+\textbf{SmolLM2-135M Zero-Shot adjusted accuracy when counting unknown predictins as false answers is 0.38}
+
+
+
+
+
+
+
+\begin{table*}
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+Model & Total Inference Time (s) & Average Inference Time (s)  \\
+\hline\hline
+SmolLM2-135M Zero-Shot   & 464.59 & 0.02    \\
+
+SmolLM2-360M Zero-Shot   & 499.90 & 0.02    \\
+
+SmolLM2-1.7B ~ Zero-Shot & 342.76 & 0.01    \\
+
+SmolLM2-135M Few-Shot    & 342.76 & 0.02    \\
+
+SmolLM2-360M Few-Shot    & 490.53 & 0.02    \\
+
+SmolLM2-1.7B ~ Few-Shot  & 333.55 & 0.01    \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Default SmolLM2 Model's Inference Times on Test Dataset}
+\label{tab:contributions}
+\end{table*}
+
+
 (10 points) How did you measure success? What experiments were used? What were the results, both quantitative and qualitative? Did you succeed? Did you fail? Why? Justify your reasons with arguments supported by evidence and data.
 
 \textbf{Important: This section should be rigorous and thorough. Present detailed information about decision you made, why you made them, and any evidence/experimentation to back them up. This is especially true if you leveraged existing architectures, pre-trained models, and code (i.e. do not just show results of fine-tuning a pre-trained model without any analysis, claims/evidence, and conclusions, as that tends to not make a strong project). }
@@ -96,20 +193,7 @@ This project aims to compare the performance and computational costs of small an
 %-------------------------------------------------------------------------
 \section{Other Sections}
 
-\begin{table*}
-\begin{center}
-\begin{tabular}{|l|c|p{8cm}|}
-\hline
-Student Name & Contributed Aspects & Details \\
-\hline\hline
-Jaden Zwicker & Default Model Experimentation & Scraped the dataset for this project and trained the CNN of the encoder. Implemented attention mechanism to improve results. \\
-Team Member 2 & Implementation and Analysis & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Contributions of team members.}
-\label{tab:contributions}
-\end{table*}
+
 
 
 
@@ -143,12 +227,11 @@ Briefly discuss potential future work that the research community could focus on
 
 \section{Work Division}
 
-Please add a section on the delegation of work among team members at the end of the report, in the form of a table and paragraph description. This and references do \textbf{NOT} count towards your page limit. An example has been provided in Table \ref{tab:contributions}.
+A summary of each authors contributions are provided in Table \ref{tab:contributions}.
 
-\newpage
-\newpage
+\section{Appendix}
 
-
+\textbf{add github repo with our code for tests}
 
 % \section{Miscellaneous Information}
 
@@ -433,6 +516,33 @@ Please add a section on the delegation of work among team members at the end of 
 
 % %-------------------------------------------------------------------------
 
+
+
+% Table of participation
+\newpage
+
+\begin{table*}
+\begin{center}
+\begin{tabular}{|l|c|p{8cm}|}
+\hline
+Student Name & Contributed Aspects & Details \\
+\hline\hline
+Jaden Zwicker & Default Model Experimentation & 
+Performed various experiments on the 3 SmolLM2 models in their default configuration. Analyzed the results of these experiments to compare and contrast them with the larger LLMs to set a baseline of performance before fine tuning. 
+\\
+
+Team Member 2 & Implementation and Analysis & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
+
+Team Member 3 & Implementation and Analysis & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
+
+\hline
+\end{tabular}
+\end{center}
+\caption{Contributions of team members.}
+\label{tab:contributions}
+\end{table*}
+
+\newpage
 
 {\small
 \bibliographystyle{ieee_fullname}
