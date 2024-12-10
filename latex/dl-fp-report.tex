@@ -65,38 +65,115 @@ Our goal is to demonstrate how fine-tuned small models can offer a competitive a
 
 %%%%%%%%% BODY TEXT
 \section{Introduction/Background/Motivation}
+\textbf{MENTION THE PARAM SIZE OF THE MODELS AND TIE IT BACK TO THE PROBLEM WE ARE SOLVING AND WHAT DIFF IT WILL MAKE}
+
 This project aims to compare the performance and computational costs of small and large language models for sentiment analysis on the IMDb movie reviews dataset \cite{IMDB-dataset}. The objective is to demonstrate that simpler models, when properly tuned, can deliver competitive performance without the need for expensive computational resources. This project will also explore how the small and large language models compare to traditional machine learning models like naive bayes, logistic regression, and random forest learners. By showcasing the effectiveness of lightweight models, we seek to address the widespread over-reliance on large, resource-intensive models and provide a sufficient and cost effective alternative. 
 
-\textcolor{red}{(5 points) What did you try to do? What problem did you try to solve? Articulate your objectives using absolutely no jargon.} 
+Furthermore the source of the small models, which we sought to fine tune, mentions that they were specifically designed for this type of use case \cite{hf-smollm-usecase}. In their analysis they mention that iPhone 15 Pros have 8GB of DRAM which is sufficient to run all three of their SmolLM2 Models \cite{hf-smollm2-collection}. With this they provide a memory footprint, which is in Figure \ref{fig:smollm-memory}, of the models in their default configurations proving just how little computational resources are needed to run these models which we hope to get to a point of comparable performance to larger industry grade LLMs.
 
-\cite{hf-smollm-usecase}
-
-\textcolor{red}{(5 points) How is it done today, and what are the limits of current practice?}
-
-\textcolor{red}{(5 points) Who cares? If you are successful, what difference will it make?} 
+In today's world, sentiment analysis for simple tasks like review
+classification is often performed using heavy-weight models such as BERT and GPT. The limits of the current practice include longer training and inference times, higher energy consumption, and restricted accessibility for smaller organizations or individuals. These models also require expensive hardware and consume significant computing resources, making them costly to implement. This approach is extremely resource intensive for straightforward tasks,
+whereas lightweight models can achieve competitive results at a fraction of the cost and training time.
 
 
+\subsection{Why this project matters}
+If this project succeeds, and the SmolLM is able to achieve competitive results, then this will provide a means for small businesses and even individuals to implement simple sentiment analysis without the need for advanced hardware or significant computing resources. Sentiment analysis would become more accessible and usable to a wider range of clients, improving their business insights and application capabilities
+
+\begin{figure}[t]
+\begin{center}
+% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+\fbox{
+    \includegraphics[width=0.8\linewidth]{figures/smollm-memory.png}
+}
+\end{center}
+   \caption{Memory footprint of SmolLM models \cite{hf-smollm-usecase}.}
+\label{fig:smollm-memory}
+\end{figure}
+
+
+\begin{figure}[t]
+\begin{center}
+% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+\fbox{
+    \includegraphics[width=1\linewidth]{figures/smollm-params.png}
+}
+\end{center}
+   \caption{Architecture details of SmolLM models \cite{hf-smollm-usecase}.}
+\label{fig:smollm-parameteres}
+\end{figure}
+
+
+\subsection{Dataset Selection}
+The dataset chosen to test the various models sentiment analysis capabilities was the IMDb's movie Review dataset \cite{IMDB-dataset}. This dataset contains strings of movie reviews, which was pulled from IMDb's website in 2011 making it a sample of the total amount of reviews they store. Each movie review sample is accompanied by the dataset's binary sentiment classification of Positive or Negative. The dataset contains 50,000 total samples with 25,000 being for training and 25,000 for testing with an approximately 50/50 split between Positive and Negative classifications. These specifics of the dataset make it very balanced leading to it being well tested in literature and the perfect benchmark for basic sentiment analysis. Given the datasets format as strings already and it being from the same creators as the models we were testing no pre-processing was needed outside of tokenizing each input prompt before feeding it into the language models. 
 
 
 
-\subsection{Dataset}
-The dataset chosen to test the various models sentiment analysis capabilities was the IMDb's movie Review dataset \cite{IMDB-dataset}. This dataset contains strings of movie reviews, which was pulled from IMDb's website in 2011 making it a sample of the total amount of reviews they store. Each movie review sample is accompanied by the dataset's binary sentiment classification of Positive or Negative. The dataset contains 50000 total samples with 25000 being for training and 25000 for testing with an approximately 50/50 split between Positive and Negative classifications. These specifics of the dataset make it very balanced leading to it being well tested in literature and the perfect benchmark for basic sentiment analysis. 
 
 %------------------------------------------------------------------------
 \section{Approach}
 
 \textbf{Mention the models were run on A100 with 40gb for consistency among tests}
-\textbf{HUGE NOTE, the order of pos vs neg in the asking of sentiment matters alot, first one listed tends to be the default models answer. 
-Models tend to say true more because they see it first in the prompt, but to counter this they do default to negative.}
 
 
-(10 points) What did you do exactly? How did you solve the problem? Why did you think it would be successful? Is anything new in your approach? 
-
-(5 points) What problems did you anticipate? What problems did you encounter? Did the very first thing you tried work? 
+\subsection{SmolLM Choice}
+Talk about why we chose the models in more detail, ie small and can run on phone and open source. Cite this \cite{hf-smollm-usecase}.
+Also, mention why 135M over the other models
 
 \textbf{Important: Mention any code repositories (with citations) or other sources that you used, and specifically what changes you made to them for your project. }
 
+
+
+\subsection{Generating SmolLM Benchmarks}
+To first investigate or compare the variety of models mentioned some initial tests and benchmarking had to be done. While traditional ML techniques for sentiment analysis and well documented LLMs have existing literature providing metrics for them running on the IMDb dataset \cite{IMDB-dataset} our choice for tuning a SmolLM model would require us to determine the baseline performance. Hence one of the first goals of this project was to test all three sizes of SmolLM models in both zero-shot and few-shot scenarios so later comparisons could better be made. This benchmarking was done on the 25,000 test samples from the dataset with each sample getting its own individual prompt to the model (no batching was used). 
+
+An initial problem which was quickly realized from the zero-shot testing was that the SmolLM models did not always return a clear Positive or Negative classification of the movie prompt. Since no previous examples of answering the question were given (few-shot did this) the smaller sized models such as SmolLM-135M would simple repeat the question back or answer with random commonly used words such as 'I' or The repeatedly. To accommodate for this issue our initial approach had to be adjusted. Rather then parse the full reply that the models generated we took the top 50 most probable next words (logits) that the model generated and parsed through them to see if Positive of Negative appeared and if it did the first one was taken as the models answer. This methodology keeps the premise of sentiment analysis while taking into account that LLMs can give wordy responses making it hard to determine what sentiment they actually gave the prompt. Also, if the model was unable in those 50 most likely words to give an answer of either Positive of Negative this was treated as a default Negative answer however, we tracked these scenarios to bring up in later data points and analysis. 
+
+Another initial testing issue that arouse, all of which allowed us to learn about the models better before fine tuning, was the dependence on the prompting method for determining the Models response. For example, if the prompt was phrased as follows: \textit{\textbf{"Only Answer if this Movie Review is Positive or Negative:"}} then the smaller models would be more likely to select the first mentioned classification. So if the prompt asked Positive vs Negative then the model would be biased towards the Positive class. We could not determine a good way to elevate this for the zero-shot testing which is why we set the default class to Negative to assist in biases the choice the other direction. For the more advanced larger models or for the few-shot prompts this was less of an issue but during testing some bias could have been shown to the Positive class. 
+
+Finally, for the few-shot prompting of the models 3 example reviews were used before appending the given sample to the end of them. The 3 example reviews were generated by us and were purposely kept short for the sake of the models interpretation of them, they can be seen in Table \ref{tab:few-shot-prompts}.
+
+\begin{table*}
+\begin{center}
+% shrinks font as needed to fit the table
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|l|}
+\hline\hline
+Few-shot Prompt 1 & 
+Movie Review: I loved this movie ! So good plot ! \n Only Answer if this Movie Review is Positive or Negative: Positive \\
+
+Few-shot Prompt 2 & 
+Movie Review: I hated this, could be a lot better \n Only Answer if this Movie Review is Positive or Negative: Negative \\
+
+Few-shot Prompt 3 & 
+Movie Review: This move was so good I would recommend to all my friends! \n Only Answer if this Movie Review is Positive or Negative: Positive \\
+\hline
+\end{tabular}
+}
+\end{center}
+\caption{Few-shot prompts used to test default SmolLM models.}
+\label{tab:few-shot-prompts}
+\end{table*}
+
+
+\subsection{Fine-tuning SmolLM-135M}
+
+
+
+\textbf{(10 points) What did you do exactly? How did you solve the problem? Why did you think it would be successful? Is anything new in your approach? }
+
+\textbf{(5 points) What problems did you anticipate? What problems did you encounter? Did the very first thing you tried work? }
+
+
+
 \section{Experiments and Results}
+\textbf{(10 points) How did you measure success? What experiments were used? What were the results, both quantitative and qualitative? Did you succeed? Did you fail? Why? Justify your reasons with arguments supported by evidence and data.}
+
+\textbf{Important: This section should be rigorous and thorough. Present detailed information about decision you made, why you made them, and any evidence/experimentation to back them up. This is especially true if you leveraged existing architectures, pre-trained models, and code (i.e. do not just show results of fine-tuning a pre-trained model without any analysis, claims/evidence, and conclusions, as that tends to not make a strong project). }
+
+\subsection{Testing Default SmolLM Models}
+
+
+
 
 % To calculate the values of accuracy, recall, specificity, precision, and F-score, you need the confusion matrix or the key components: True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN). Here's how each metric is calculated:
 
@@ -149,13 +226,40 @@ SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% 
 \end{tabular}
 }
 \end{center}
+\caption{Large Model's Performance on IMDb Dataset}
+\label{tab:contributions}
+\end{table*}
+
+
+
+\begin{table*}
+\begin{center}
+% shrinks font as needed to fit the table
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+\hline
+Model & Accuracy & Recall & Specificity & Precision & F-Score & \% Positive & \% Negative & \# Unknown \\
+\hline\hline
+SmolLM2-135M Zero-Shot   & 0.50 & 0.01 & 1.00 & 0.78 & 0.02 & 00.78\%  & 99.22\% & 2993  \\
+
+SmolLM2-360M Zero-Shot   & 0.56 & 1.00 & 0.11 & 0.53 & 0.69 & 94.26\% & 05.74\%  & 2     \\
+
+SmolLM2-1.7B ~ Zero-Shot & 0.72 & 0.99 & 0.45 & 0.65 & 0.78 & 77.01\% & 22.99\% & 14    \\
+
+SmolLM2-135M Few-Shot    & 0.59 & 0.80 & 0.37 & 0.56 & 0.66 & 71.86\% & 28.14\% & 0     \\
+
+SmolLM2-360M Few-Shot    & 0.66 & 0.99 & 0.33 & 0.60 & 0.75 & 82.74\% & 17.26\% & 0     \\
+
+SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% & 0     \\
+\hline
+\end{tabular}
+}
+\end{center}
 \caption{Default SmolLM2 Model's Results on Test Dataset}
 \label{tab:contributions}
 \end{table*}
 
 \textbf{SmolLM2-135M Zero-Shot adjusted accuracy when counting unknown predictins as false answers is 0.38}
-
-
 
 
 
@@ -186,9 +290,15 @@ SmolLM2-1.7B ~ Few-Shot  & 333.55 & 0.01    \\
 \end{table*}
 
 
-(10 points) How did you measure success? What experiments were used? What were the results, both quantitative and qualitative? Did you succeed? Did you fail? Why? Justify your reasons with arguments supported by evidence and data.
+\subsection{Comparison Between LLMs, Traditional ML, and SmolLMs}
+Experiment 4
 
-\textbf{Important: This section should be rigorous and thorough. Present detailed information about decision you made, why you made them, and any evidence/experimentation to back them up. This is especially true if you leveraged existing architectures, pre-trained models, and code (i.e. do not just show results of fine-tuning a pre-trained model without any analysis, claims/evidence, and conclusions, as that tends to not make a strong project). }
+
+
+
+\subsection{Results of Fine-tuning SmolLM-135M}
+\textbf{recompare and give data and why stuff was how it was}
+
 
 %-------------------------------------------------------------------------
 \section{Other Sections}
@@ -229,9 +339,7 @@ Briefly discuss potential future work that the research community could focus on
 
 A summary of each authors contributions are provided in Table \ref{tab:contributions}.
 
-\section{Appendix}
 
-\textbf{add github repo with our code for tests}
 
 % \section{Miscellaneous Information}
 
@@ -517,36 +625,53 @@ A summary of each authors contributions are provided in Table \ref{tab:contribut
 % %-------------------------------------------------------------------------
 
 
-
-% Table of participation
-\newpage
-
-\begin{table*}
-\begin{center}
-\begin{tabular}{|l|c|p{8cm}|}
-\hline
-Student Name & Contributed Aspects & Details \\
-\hline\hline
-Jaden Zwicker & Default Model Experimentation & 
-Performed various experiments on the 3 SmolLM2 models in their default configuration. Analyzed the results of these experiments to compare and contrast them with the larger LLMs to set a baseline of performance before fine tuning. 
-\\
-
-Team Member 2 & Implementation and Analysis & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
-
-Team Member 3 & Implementation and Analysis & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
-
-\hline
-\end{tabular}
-\end{center}
-\caption{Contributions of team members.}
-\label{tab:contributions}
-\end{table*}
-
 \newpage
 
 {\small
 \bibliographystyle{ieee_fullname}
 \bibliography{dl-fp-refrences}
 }
+
+
+\newpage
+
+\section{A. Project Code Repository}
+The Github repository containing the experiments mentioned throughout the report alongside the default and tuned models can be found \hyperlink{https://github.com/jadenzwicker/DL-Final-Project/tree/main}{here}. 
+
+
+
+
+
+
+% Table of participation
+\newpage
+
+\begin{table*}
+\begin{center}
+% shrinks font as needed to fit the table
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|p{8cm}|}
+\hline
+Student Name & Contributed Aspects & Details \\
+\hline\hline
+Jaden Zwicker & Default Model Experimentation \& Analysis & 
+Performed various experiments on the 3 SmolLM2 models in their default configuration. Analyzed the results of these experiments to compare and contrast them with the larger LLMs and to set a baseline of performance before fine tuning. 
+\\
+
+Houshmand Abbaszadeh & Analysis \& Comparison of Various ML Techniques & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
+
+Team Member 3 & Implementation and Analysis & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
+
+\hline
+\end{tabular}
+}
+\end{center}
+\caption{Contributions of team members.}
+\label{tab:contributions}
+\end{table*}
+
+
+
+
 
 \end{document}
