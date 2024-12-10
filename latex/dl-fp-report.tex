@@ -33,14 +33,14 @@ Small NLP: CS 7643
 \author{
 Jaden Zwicker, 
 Houshmand Abbaszadeh,
-Third Author 
+Brieuc Popper
 \\
 Georgia Institute of Technology\\
 Atlanta, GA 30332\\
 {\tt\small 
 jzwicker3@gatech.edu, 
 habbaszadeh6@gatech.edu, 
-thirdauthoremail@gatech.edu}
+bpopper3@gatech.edu}
 % For a paper whose authors are all at the same institution,
 % omit the following lines up until the closing ``}''.
 % Additional authors and addresses can be added with ``\and'',
@@ -57,27 +57,34 @@ thirdauthoremail@gatech.edu}
 \begin{abstract}
 Recent advancements in large language models (LLMs) have set unprecedented benchmarks in sentiment analysis, but their exceptional performance often comes at the cost of significant computational resources. This project investigates the viability of a lightweight, fine-tuned deep learning model capable of running on modest hardware, as a cost-effective alternative to models like BERT and GPT. Using IMDb’s movie review dataset \cite{IMDB-dataset}, we evaluate the performance of a 135M-parameter small LLM, “SmolLM,” leveraging few-shot learning and fine-tuning to improve its sentiment analysis capabilities.
 
-The project benchmarks SmolLM against state-of-the-art LLMs, non-transformer deep learning networks such as CNNs and LSTMs, and traditional machine learning approaches like Logistic Regression, Naive Bayes, and Random Forests. Performance metrics are derived from internal experimentation as well as from existing literature on this well-studied dataset.
+The project benchmarks SmolLM against state-of-the-art LLMs, but also non-transformer-based deep learning networks such as CNNs and LSTMs, and traditional machine learning approaches like Logistic Regression, Naive Bayes, and Random Forests. Performance metrics are derived from internal experimentation as well as from existing literature on this well-studied dataset.
 
-Our goal is to demonstrate how fine-tuned small models can offer a competitive alternative to traditional methods and larger LLMs for relatively simple NLP tasks. In addition, we explore the diminishing returns of computationally intensive models, highlighting the potential to reduce deployment and operational costs without sacrificing performance. The outcomes of this work aim to guide practitioners in balancing accuracy with resource efficiency in sentiment analysis tasks.
+Our goal is to investigate how fine-tuned small LLMs can offer a competitive alternative to traditional methods and larger LLMs for sentiment analysis. In addition, we explore the diminishing returns of computationally intensive models, highlighting the potential to reduce deployment and operational costs without sacrificing performance. The outcomes of this work aim to guide practitioners in balancing accuracy with resource efficiency in sentiment analysis tasks.
 
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
-\section{Introduction/Background/Motivation}
-\textbf{MENTION THE PARAM SIZE OF THE MODELS AND TIE IT BACK TO THE PROBLEM WE ARE SOLVING AND WHAT DIFF IT WILL MAKE}
+\section{Introduction and Motivation}
 
-This project aims to compare the performance and computational costs of small and large language models for sentiment analysis on the IMDb movie reviews dataset \cite{IMDB-dataset}. The objective is to demonstrate that simpler models, when properly tuned, can deliver competitive performance without the need for expensive computational resources. This project will also explore how the small and large language models compare to traditional machine learning models like naive bayes, logistic regression, and random forest learners. By showcasing the effectiveness of lightweight models, we seek to address the widespread over-reliance on large, resource-intensive models and provide a sufficient and cost effective alternative. 
 
-Furthermore the source of the small models, which we sought to fine tune, mentions that they were specifically designed for this type of use case \cite{hf-smollm-usecase}. In their analysis they mention that iPhone 15 Pros have 8GB of DRAM which is sufficient to run all three of their SmolLM2 Models \cite{hf-smollm2-collection}. With this they provide a memory footprint, which is in Figure \ref{fig:smollm-memory}, of the models in their default configurations proving just how little computational resources are needed to run these models which we hope to get to a point of comparable performance to larger industry grade LLMs.
+This project aims to compare the performance and computational costs of small and large language models for sentiment analysis on the IMDb movie reviews dataset \cite{IMDB-dataset}. The objective is to demonstrate that simpler models, when properly tuned, can deliver competitive performance without the need for expensive computational resources.  This project will also explore how the small and large language models compare to traditional machine learning models like naive bayes, logistic regression, and random forest learners. By showcasing the effectiveness of lightweight models, we seek to address the widespread over-reliance on large, resource-intensive models and provide a sufficient and cost effective alternative. 
 
-In today's world, sentiment analysis for simple tasks like review
-classification is often performed using heavy-weight models such as BERT and GPT. The limits of the current practice include longer training and inference times, higher energy consumption, and restricted accessibility for smaller organizations or individuals. These models also require expensive hardware and consume significant computing resources, making them costly to implement. This approach is extremely resource intensive for straightforward tasks,
-whereas lightweight models can achieve competitive results at a fraction of the cost and training time.
+The IMDb dataset is a well-known dataset of movie reviews. Each movie review is approximately a few paragraphs, and the challenge is to perform binary sentiment analysis : predict if the movie review is \textit{positive} or \textit{negative}. A lot of researchers have tackled this problem and proposed very light models that achieve relatively good (more than 90\%) accuracy on this benchmark. Using modern LLMs can achieve extremely impressive results (more than 94\% accuracy), but at a great computational cost. We choose to explore the viability of a very small LLM (135M parameters, which is less than GPT-2, and orders of magnitude less than SOTA LLMs) for sentiment analysis.
+
+Furthermore the authors of this small model SmolLM, which we sought to fine tune, mentions that they were specifically designed for this type of use case \cite{hf-smollm-usecase}. In their analysis they mention that iPhone 15 Pros have 8GB of DRAM which is sufficient to run all three of their SmolLM2 Models \cite{hf-smollm2-collection}. With this they provide a memory footprint, which is in Figure \ref{fig:smollm-memory}, of the models in their default configurations proving just how little computational resources are needed to run these models which we hope to get to a point of comparable performance to larger industry grade LLMs.
+
+All this being said, it is unlikely that a LLM is the best fitted solution for this task. We focus on exploring specifically how well a small LLM can perform at this task, and how it matches up to other bigger LLMs, and then finally how it compares to other non-LLM techniques.
+% In today's world, sentiment analysis for simple tasks like review
+% classification is often performed using heavy-weight models such as BERT and GPT. The limits of the current practice include longer training and inference times, higher energy consumption, and restricted accessibility for smaller organizations or individuals. These models also require expensive hardware and consume significant computing resources, making them costly to implement. This approach is extremely resource intensive for straightforward tasks,
+% whereas lightweight models can achieve competitive results at a fraction of the cost and training time.
+
+
 
 
 \subsection{Why this project matters}
-If this project succeeds, and the SmolLM is able to achieve competitive results, then this will provide a means for small businesses and even individuals to implement simple sentiment analysis without the need for advanced hardware or significant computing resources. Sentiment analysis would become more accessible and usable to a wider range of clients, improving their business insights and application capabilities
+Recently, some researchers have started to focus on extremely small-scale LLMs, that can run on-device even on some smartphones. These enable very small inference time with low computational requirements, and can be trained with less cost. It is unclear what use cases these LLMs can be used for however, as usually even 7 billion parameters LLMs are considered pretty bad at most tasks in 2024.
+This projet aims to quantify how well SmolLM ( 135 Million parameters) can perform at simple sentiment analysis, how to set it up to achieve the best results, and to measure in detail the cost reduction.
+% If this project succeeds, and the SmolLM is able to achieve competitive results, then this will provide a means for small businesses and even individuals to implement simple sentiment analysis without the need for advanced hardware or significant computing resources. Sentiment analysis would become more accessible and usable to a wider range of clients, improving their business insights and application capabilities
 
 \begin{figure}[t]
 \begin{center}
@@ -112,23 +119,23 @@ The dataset chosen to test the various models sentiment analysis capabilities wa
 %------------------------------------------------------------------------
 \section{Approach}
 
-\textbf{Mention the models were run on A100 with 40gb for consistency among tests}
+% \textbf{Mention the models were run on A100 with 40gb for consistency among tests}
 
 
 \subsection{SmolLM Choice}
-Talk about why we chose the models in more detail for fine tuning and beating LLMs, ie small and can run on phone and open source. Cite this \cite{hf-smollm-usecase}.
-Also, mention why 135M over the other models
+SmolLM2 \cite{hf-smollm-usecase}, developed by Hugging Face, is a family of compact language models designed for efficiency and on-device performance. Available in three sizes—135M, 360M, and 1.7B parameters. Despite their smaller size, SmolLM2 models perform competitively on benchmarks for reasoning, coding, and general knowledge tasks, making them ideal for resource-constrained applications like mobile or edge computing.
+We chose SmolLM2 because it is a very recent and efficient model available in extremely small parameter sizes. The fact that it has multiple parameter size is also something we were looking for as it is possible to easily compare the impact of scale by switching between the different parameter size. We focused on the 135M model as the goal of this study is to see the viability of an extremely small LLM for simple NLP tasks. 
 
-\textbf{Important: Mention any code repositories (with citations) or other sources that you used, and specifically what changes you made to them for your project. }
+% \textbf{Important: Mention any code repositories (with citations) or other sources that you used, and specifically what changes you made to them for your project. }
 
 
 
 \subsection{Generating SmolLM Benchmarks}
-To first investigate or compare the variety of models mentioned some initial tests and benchmarking had to be done. While traditional ML techniques for sentiment analysis and well documented LLMs have existing literature providing metrics for them running on the IMDb dataset \cite{IMDB-dataset} our choice for tuning a SmolLM model would require us to determine the baseline performance. Hence one of the first goals of this project was to test all three sizes of SmolLM models in both zero-shot and few-shot scenarios so later comparisons could better be made. This benchmarking was done on the 25,000 test samples from the dataset with each sample getting its own individual prompt to the model (no batching was used). 
+To first investigate or compare the variety of models mentioned some initial tests and benchmarking had to be done. While traditional ML techniques for sentiment analysis and well documented LLMs have existing literature providing metrics for them running on the IMDb dataset \cite{IMDB-dataset} our choice for tuning a SmolLM model would require us to determine the baseline performance. Hence one of the first goals of this project was to test all three sizes of SmolLM models in both zero-shot and few-shot scenarios so later comparisons could better be made. This benchmarking was done on the 25,000 test samples from the dataset with each sample getting its own individual prompt to the model (no batching was used). The expected outcome of this experiment was that the greater parameter models would perform quite a bit better in terms of accuracy with few-shot learning also outperforming zero-shot in terms of simple accuracy. 
 
 An initial problem which was quickly realized from the zero-shot testing was that the SmolLM models did not always return a clear Positive or Negative classification of the movie prompt. Since no previous examples of answering the question were given (few-shot did this) the smaller sized models such as SmolLM-135M would simple repeat the question back or answer with random commonly used words such as 'I' or The repeatedly. To accommodate for this issue our initial approach had to be adjusted. Rather then parse the full reply that the models generated we took the top 50 most probable next words (logits) that the model generated and parsed through them to see if Positive of Negative appeared and if it did the first one was taken as the models answer. This methodology keeps the premise of sentiment analysis while taking into account that LLMs can give wordy responses making it hard to determine what sentiment they actually gave the prompt. Also, if the model was unable in those 50 most likely words to give an answer of either Positive of Negative this was treated as a default Negative answer however, we tracked these scenarios to bring up in later data points and analysis. 
 
-Another initial testing issue that arouse, all of which allowed us to learn about the models better before fine tuning, was the dependence on the prompting method for determining the Models response. For example, if the prompt was phrased as follows: \textit{\textbf{"Only Answer if this Movie Review is Positive or Negative:"}} then the smaller models would be more likely to select the first mentioned classification. So if the prompt asked Positive vs Negative then the model would be biased towards the Positive class. We could not determine a good way to elevate this for the zero-shot testing which is why we set the default class to Negative to assist in biases the choice the other direction. For the more advanced larger models or for the few-shot prompts this was less of an issue but during testing some bias could have been shown to the Positive class. 
+Another initial testing issue that arose, all of which allowed us to learn about the models better before fine tuning, was the dependence on the prompting method for determining the Models response. For example, if the prompt was phrased as follows: \textit{\textbf{"Only Answer if this Movie Review is Positive or Negative:"}} then the smaller models would be more likely to select the first mentioned classification. So if the prompt asked Positive vs Negative then the model would be biased towards the Positive class. We could not determine a good way to elevate this for the zero-shot testing which is why we set the default class to Negative to assist in biases the choice the other direction. For the more advanced larger models or for the few-shot prompts this was less of an issue but during testing some bias could have been shown to the Positive class. 
 
 Finally, for the few-shot prompting of the models 3 example reviews were used before appending the given sample to the end of them. The 3 example reviews were generated by us and were purposely kept short for the sake of the models interpretation of them, they can be seen in Table \ref{tab:few-shot-prompts}.
 
@@ -155,17 +162,21 @@ Movie Review: This move was so good I would recommend to all my friends! \n Only
 \end{table*}
 
 
-\subsection{Gathering Data on LLMs and ML techniques}
+% \subsection{Gathering Data on LLMs and ML techniques}
 
 
 \subsection{Fine-tuning SmolLM-135M}
+\label{sec:ft_setup}
 
+In addition to testing out SmolLM in zero-shot and few-shot settings, we decided to fine-tune it specifically for the IMDb benchmark. Our approach adapts the pretrained language model for binary sentiment classification (positive/negative), by replacing the original language model's head with a custom classification head. The SmolLM weights were frozen, and only the final custom classification head was trained.
+This aims to leverage SmolLM's knowledge about language in general, as the embeddings in the last layer probably have rich context-aware information gained from the successive attention blocks in the Transformer architecture.
 
+It was unclear which token exactly to use the embedding as an input for the final layer. Something that is often done when fine-tuning LLMs is to use the very first token of the sequence's embedding. In that case the sequence would just be the whole paragraph of the movie review. However this did not work well in our experiments.
+In the end we chose a prompt resembling a few-shot prompt.
 
-\textbf{(10 points) What did you do exactly? How did you solve the problem? Why did you think it would be successful? Is anything new in your approach? }
+\textit{"example movie review"} ; this movie review is : \textit{positive} ; \textit{"example moview review 2"} ; this movie review is : \textit{negative} ; \textit{"movie review to do inference on"} ; this movie \textbf{review} is :
 
-\textbf{(5 points) What problems did you anticipate? What problems did you encounter? Did the very first thing you tried work? }
-
+We then used the embedding from the token highlighted in bold from the last layer of the language model and used this as the input for the custom classification head.
 
 
 \section{Experiments and Results}
@@ -203,72 +214,99 @@ Movie Review: This move was so good I would recommend to all my friends! \n Only
 
 
 
-
 \subsection{Testing Default SmolLM Models}
-Results are given in Tables \ref{tab:default-smollm-metrics} and \ref{tab:default-smollm-times}. 
+To address the first needed experiment from our approach in the aim of comparing various models some benchmarks had to be created on the 3 types of SmolLM models. All three; 135M, 360M, and 1.7B parameter  SmolLM models were tested on the test section of the IMDb dataset \cite{IMDB-dataset} with both zero-shot methods and few-shot methods. The results of these experiments are given in Table \ref{tab:default-smollm-metrics} with the models overall accuracy being shown alongside the distribution of classifications which the models made over the prompts. More detailed metrics such as Recall, Specificity, Precision, and F-Score were calculated but are not necessary as relevant to the discussion of comparing these models to the other methods of sentiment analysis due to the dataset being binary and balanced. Instead the sentiment from these advanced metrics is carried over through the discussion of the classifications that the models chose. 
 
-\begin{table*}
-\begin{center}
-% shrinks font as needed to fit the table
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+% \begin{table*}
+% \begin{center}
+% % shrinks font as needed to fit the table
+% \resizebox{\textwidth}{!}{%
+% \begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+% \hline
+% Model & Accuracy & Recall & Specificity & Precision & F-Score & \% Positive & \% Negative & \# Unknown \\
+% \hline\hline
+% SmolLM2-135M Zero-Shot   & 0.50 & 0.01 & 1.00 & 0.78 & 0.02 & 00.78\%  & 99.22\% & 2993  \\
+
+% SmolLM2-360M Zero-Shot   & 0.56 & 1.00 & 0.11 & 0.53 & 0.69 & 94.26\% & 05.74\%  & 2     \\
+
+% SmolLM2-1.7B ~ Zero-Shot & 0.72 & 0.99 & 0.45 & 0.65 & 0.78 & 77.01\% & 22.99\% & 14    \\
+
+% SmolLM2-135M Few-Shot    & 0.59 & 0.80 & 0.37 & 0.56 & 0.66 & 71.86\% & 28.14\% & 0     \\
+
+% SmolLM2-360M Few-Shot    & 0.66 & 0.99 & 0.33 & 0.60 & 0.75 & 82.74\% & 17.26\% & 0     \\
+
+% SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% & 0     \\
+% \hline
+% \end{tabular}
+% }
+% \end{center}
+% \caption{Default SmolLM2 Model's Performance Metrics on IMDb Test Dataset}
+% \label{tab:default-smollm-metrics}
+% \end{table*}
+
+
+\begin{table*}[ht]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
 \hline
-Model & Accuracy & Recall & Specificity & Precision & F-Score & \% Positive & \% Negative & \# Unknown \\
+\textbf{Model} & \textbf{Accuracy} & \textbf{\% Positive} & \textbf{\% Negative} & \textbf{\# Unknown} \\ 
 \hline\hline
-SmolLM2-135M Zero-Shot   & 0.50 & 0.01 & 1.00 & 0.78 & 0.02 & 00.78\%  & 99.22\% & 2993  \\
-
-SmolLM2-360M Zero-Shot   & 0.56 & 1.00 & 0.11 & 0.53 & 0.69 & 94.26\% & 05.74\%  & 2     \\
-
-SmolLM2-1.7B ~ Zero-Shot & 0.72 & 0.99 & 0.45 & 0.65 & 0.78 & 77.01\% & 22.99\% & 14    \\
-
-SmolLM2-135M Few-Shot    & 0.59 & 0.80 & 0.37 & 0.56 & 0.66 & 71.86\% & 28.14\% & 0     \\
-
-SmolLM2-360M Few-Shot    & 0.66 & 0.99 & 0.33 & 0.60 & 0.75 & 82.74\% & 17.26\% & 0     \\
-
-SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% & 0     \\
+SmolLM2-135M Zero-Shot   & 0.50 & 00.78\%  & 99.22\% & 2993 \\ 
+SmolLM2-360M Zero-Shot   & 0.56 & 94.26\%  & 05.74\% & 2    \\ 
+SmolLM2-1.7B ~ Zero-Shot   & 0.72 & 77.01\%  & 22.99\% & 14   \\ 
+SmolLM2-135M Few-Shot    & 0.59 & 71.86\%  & 28.14\% & 0    \\ 
+SmolLM2-360M Few-Shot    & 0.66 & 82.74\%  & 17.26\% & 0    \\ 
+SmolLM2-1.7B ~ Few-Shot    & 0.81 & 68.48\%  & 31.52\% & 0    \\ 
 \hline
 \end{tabular}
-}
-\end{center}
 \caption{Default SmolLM2 Model's Performance Metrics on IMDb Test Dataset}
 \label{tab:default-smollm-metrics}
 \end{table*}
 
-\textbf{SmolLM2-135M Zero-Shot adjusted accuracy when counting unknown predictions as false answers is 0.38}
+To first analyze the results of the experiment it must be mentioned again that the models had a default sentiment classification of Negative. This is to explain why the percentages of Positive and Negative add up to 100\% yet the models had some choices which were Unknown (the model did not classify). All Unknown predictions were defaulted to Negative for the sake of consistency among the metrics and this did not make a noticeable difference in all of the models besides SmolLM2-135M Zero-Shot. The smallest of the models when using the least advanced method of prompting had many glaring issues, which we sought to fix, but the first of which was its inability to generate a valid classification for \textbf{2,993} samples. When taking into account its lack of classification on the overall accuracy of the model its accuracy goes from \textbf{0.5} to \textbf{0.38} making it by far the worst performing model in this project. 
+
+Furthermore, the SmolLM2-135M Zero-Shot model was the only one to pick majority Negative for the classification at 99.22\% meaning its accuracy of 0.5 or 0.38 was not achieved by any smart methods which would generalize but more so by just picking one of the binary classification options. The reasoning for its preference of the Negative classification over the Positive was an outlier as-well since all other models preferred the positive classification greatly with that preference diminishing as the models went up in parameter size and ability to digest the problem at hand. During testing of the models, as mentioned in the approach, they had a tendency to prefer the classification which was first mentioned to them in the prompt. This effected the zero-shot models more however the SmolLM2-135M model really did just break out of the curve in terms of its predictions or lack their of. 
+
+Overall the experiment was successful as demonstrating a general trend among the models and providing some baseline results for the selected language models. For all of the other models they show the expected trend of few-shot prompting adding about a 10\% increase in performance with the increase in parameters being the largest driving factor in accuracy increases with the best performing model being the SmolLM2-1.7B Few-Shot at 0.81 accuracy. This model also had the most even split between Positive and Negative classifications showing its ability to better understand the prompts being posed. While it still had a bias towards the Positive classification it was able to nearly perfectly predict any Positive prompt correctly while suffering in terms of accuracy due to false positives rather than false negatives. From this benchmarking we took away the importance of few-shot learning for our fine-tuned model and learned many lessons in how the prompts to the language models had to be structured. This also gave a good goal of potential performance to chase as we sought out to beat the best performing default model by using the smallest of the 3 with a Fine-tuned SmolLM3-135M. 
+
+
+\subsection{Comparison Between LLMs, Traditional ML, and SmolLMs}
+The goal of this experiment is to compare the performance and costs of various sentiment analysis techniques, demonstrating that there are efficient and comparable alternatives to LLMs for sentiment analysis tasks. LLMs, while impressive and effective at sentiment analysis tasks, are computationally demanding and are not suitable for environments that cannot afford to support high performance computing. This experiment compares LLMs with naive bayes, random forests, logistic regression, and SLMs, to provide a comprehensive discussion on the alternative resources for sentiment analysis tasks to LLMs. The models are compared by measuring their accuracy, precision, recall, training time, and model size. The naive bayes, random forest, and logistic regression models all use TF-IDF to improve their performance outcome by reducing the influence of common terms, terms like “the”, “and”, etc. Understanding the alternatives to LLMs for sentiment analysis tasks enables the development of efficient, resource conscious solutions for sentiment analysis tasks for users and businesses who may not have the resources to use LLMs.
+
+The naive bayes model was determined to be a satisfactory alternative to LLMs for simple sentiment analysis tasks, and for users who are okay with lower accuracy in exchange for significantly reduced memory usage and training time. Naive bayes models store conditional probabilities for each feature/class, resulting in their memory size increasing linearly with the number of features/classes. Compared to LLMs, whose size depends on their millions or billions of parameters, naive bayes models are significantly smaller. In addition, naive bayes models are simple to train, training in just O(n*d), where n is the number of samples, and d is the number of features. This is due to the relatively simple calculations needed to compute the conditional probabilities of words and classes for each sentiment sample. Its performance on complex textual samples is hindered by its interpretation of each word as independent, resulting in erroneous classifications on samples that have conflicting word/sentiment probabilities. For example, a review that says “This movie was so good it made me want to ignore the whole thing and scroll on my phone instead” might be incorrectly classified as a positive review due to the high weight that “good” places on the positive review class probability. However, for simple texts such as those in the IMDb dataset, naive bayes achieved decent results: 0.8228 accuracy, 0.8285 precision, and 0.8174  recall. These results indicate that the naive bayes model can correctly assign the correct sentiment class most of the time, but still has significant error. 
+
+The random forest model was determined to be a dissatisfactory alternative to LLMs due to its relatively high memory usage and training times, and no significant improvement in results. Random forests can be large due to their size multiplicatively increasing with the number of trees, nodes, and features. In addition, random forests are trained in a time of O(t*s*f*d), where t is the number of trees, s is the number of samples, f is the number of features, and d is the average tree depth. Training time can be significantly increased with the size of the forest/dataset, and is lengthy when compared to naive bayes models, or other, similarly less complex models. When run on the IMDb dataset, the random forest model did not achieve significantly higher results than the naive bayes: 0.8562 accuracy, 0.8597 precision, 0.8539 recall. While smaller and faster to train than LLMs, random forests are not satisfactory alternatives due to still demanding relatively high memory and time resources, without the significant increase in results.
+
+Logistic regression was determined to be a good alternative to LLMs due to its high results on the IMDb dataset, and its satisfactory size and training times when compared to random forests. Logistic regression’s memory needs are dependent solely on the number of features, where random forests must account for many trees, which may have many branching subtrees/nodes. In addition, the  logistic regression model trains in a time of O(d*k), where d is the number of features, and k is the number of iterations. While slower to train than naive bayes, the significantly higher results make it a comparable choice. When run on the IMDb dataset, the logistic regression model achieved high results: 0.8914 accuracy, 0.882 precision, and 0.9055 recall. These results are comparable to LLMs, especially when the significantly lower memory requirements and training times of the logistic regression model is considered. For users who demand high results, and have decent resources for memory and training time, the logistic regression model is a good alternative to LLMs.
+
+SmolLM-135M was determined to be a good alternative to LLMs for sentiment analysis tasks due to its high accuracy. However, it is a less ideal alternative compared to logistic regression due to its slower training time and larger model size. SmolLM-135M achieved 0.892 accuracy on the IMDb dataset performing sentiment analysis. This is comparable to both logistic regression and LLMs. SmolLM-135M is faster to train than LLMs due to having only 135 million parameters compared to ChatGPT’s 1.7 billion. In addition, having significantly less parameters means that SmolLM-135M is much smaller in size and requires less memory resources for use on sentiment analysis tasks. Being able to achieve high accuracy results within 2 percentage points of LLMs, and being much smaller and faster to train, make SmolLM-135M a good alternative to LLMs for sentiment analysis applications. However, SmolLM-135M is a neural network based model, and results in a computationally intensive training process when compared to logistic regression. This, in addition to logistic regression’s comparatively small size, make it a more suitable choice for a LLM alternative in most sentiment analysis use cases. 
+
+This experiment was successful in identifying alternative models to LLMs for sentiment analysis applications. Logistics regression with TF-IDF was determined to be the ideal alternative, due to its high accuracy results, relatively fast training times, and compact model size. Logistic regression performed very well in terms of accuracy, reaching within 2 percentage points of LLMs. In most scenarios, logistic regression will provide comparable performance at a much lower cost. Naive bayes was the fastest model to train and smallest in size, but fell 10 percentage points from LLMs in terms of classification accuracy. In use cases where speed and space are a tighter constraint than accuracy, naive bayes is a good alternative to LLMs. SmolLM-135M delivered accuracy results equivalent to logistic regression but was much slower to train and significantly larger in size, making it a less favorable alternative to LLMs when compared to logistic regression. Random forests proved to be a poor alternative due to their high training times and larger size relative to other alternatives, without achieving competitive accuracy. While these lightweight models are effective for general sentiment analysis tasks, there are scenarios where LLMs offer distinct advantages. For instance, LLMs excel in understanding nuanced language features such as sarcasm, irony, or context-dependent sentiment shifts, which simpler models may struggle to capture. In conclusion, we can confidently say that lightweight, high-performing models are viable alternatives for sentiment analysis applications, offering efficient solutions without the resource demands of LLMs. Among these, logistic regression with TF-IDF stands out as the most efficient option, balancing accuracy, speed, and compactness.
 
 
 
 \begin{table*}
 \begin{center}
-\begin{tabular}{|l|c|c|}
+% shrinks font as needed to fit the table
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
 \hline
-Model & Total Inference Time (s) & Average Inference Time (s)  \\
+Model with TF-IDF & Accuracy & Precision & Recall & F-Score & AUC \\
 \hline\hline
-SmolLM2-135M Zero-Shot   & 464.59 & 0.02    \\
+Naive Bayes   & 0.8228 & 0.8285 & 0.8174 & 0.823 & 0.85   \\
 
-SmolLM2-360M Zero-Shot   & 499.90 & 0.02    \\
+Random Forest   & 0.8562 & 0.8597 & 0.8539 & 0.8568 & 0.93  \\
 
-SmolLM2-1.7B ~ Zero-Shot & 342.76 & 0.01    \\
+Logistic Regression  & 0.8914 & 0.882 & 0.9055 & 0.8936 & 0.96     \\
 
-SmolLM2-135M Few-Shot    & 342.76 & 0.02    \\
 
-SmolLM2-360M Few-Shot    & 490.53 & 0.02    \\
-
-SmolLM2-1.7B ~ Few-Shot  & 333.55 & 0.01    \\
 \hline
 \end{tabular}
+}
 \end{center}
-\caption{Default SmolLM2 Model's Inference Times on Test Dataset}
-\label{tab:default-smollm-times}
+\caption{ML techniques Performance on IMDb Dataset}
+\label{tab:large-models-metrics}
 \end{table*}
-
-
-
-
-
-
-\subsection{Comparison Between LLMs, Traditional ML, and SmolLMs}
-The goal of Experiment 4 is to compare the performance and costs of various sentiment analysis techniques, demonstrating that there are efficient and comparable alternatives to LLMs for sentiment analysis tasks, such as SLMs. SLMs are computationally efficient, achieve comparable performance, and are usable in environments with limited resources for computing. LLMs, while impressive and effective at sentiment analysis tasks, are computationally demanding and are not suitable for environments that cannot afford to support high performance computing. This experiment compares LLMs with SLMs, as well as other methods of sentiment analysis such as logistic regression, naive bayes, and random forests, to provide a comprehensive discussion on the alternative resources for sentiment analysis tasks to LLMs. The models are compared by measuring their accuracy, precision, recall, AUC(area under curve), training time, and model size. Understanding the alternatives to LLMs for sentiment analysis tasks, specifically SLMs, enables the development of efficient, resource conscious solutions for sentiment analysis tasks in diverse application contexts.
 
 
 \begin{table*}
@@ -294,7 +332,7 @@ SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% 
 \end{tabular}
 }
 \end{center}
-\caption{Large Model's Performance on IMDb Dataset}
+\caption{Large Models' Performance on IMDb Dataset}
 \label{tab:large-models-metrics}
 \end{table*}
 
@@ -302,8 +340,30 @@ SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% 
 
 
 \subsection{Results of Fine-tuning SmolLM-135M}
+
+We used the experimental setup described in section \ref{sec:ft_setup}.
+We trained for a total of 10 epochs using the whole trainig dataset, with 
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figures/W&B Chart 12_10_2024, 1_55_29 PM.png}
+    \caption{Fine-tuning SmolLM2 for 10 epochs with final accuracy reaching 89.2\%}
+    \label{fig:enter-label}
+\end{figure}
 \textbf{recompare and give data and why stuff was how it was}
 
+
+lr : 1e-4 with 120 warmup steps
+4 GPUS batch size 90 per device
+10 epochs
+0.01 weight decay
+0.2 warmup
+576 -> 384 -> 2 with cross entropy loss, batchnorm, gelu activation
+dropout
+
+Ours gets almost 90\%, tried out different architectures etc, most get 88\%, best gets 89.1\% or more.
+probably possible to squeeze out 90\% from SmolLM2, and more with bigger param size / ensembling with different prompt setups.
+
+GPT 2 finetuned gets     92.36 accuracy
 
 %-------------------------------------------------------------------------
 \section{Other Sections}
@@ -379,62 +439,6 @@ A summary of each authors contributions are provided in Table \ref{tab:contribut
 % references (e.g.\ this line is $095.5$), although in most cases one would
 % expect that the approximate location will be adequate.
 
-% \subsection{Mathematics}
-
-% Please number all of your sections and displayed equations.  It is
-% important for readers to be able to refer to any particular equation.  Just
-% because you didn't refer to it in the text doesn't mean some future reader
-% might not need to refer to it.  It is cumbersome to have to use
-% circumlocutions like ``the equation second from the top of page 3 column
-% 1''.  (Note that the ruler will not be present in the final copy, so is not
-% an alternative to equation numbers).  All authors will benefit from reading
-% Mermin's description of how to write mathematics:
-% \url{http://www.pamitc.org/documents/mermin.pdf}.
-
-% Finally, you may feel you need to tell the reader that more details can be
-% found elsewhere, and refer them to a technical report.  For conference
-% submissions, the paper must stand on its own, and not {\em require} the
-% reviewer to go to a techreport for further details.  Thus, you may say in
-% the body of the paper ``further details may be found
-% in~\cite{Authors14b}''.  Then submit the techreport as additional material.
-% Again, you may not assume the reviewers will read this material.
-
-% Sometimes your paper is about a problem which you tested using a tool which
-% is widely known to be restricted to a single institution.  For example,
-% let's say it's 1969, you have solved a key problem on the Apollo lander,
-% and you believe that the CVPR70 audience would like to hear about your
-% solution.  The work is a development of your celebrated 1968 paper entitled
-% ``Zero-g frobnication: How being the only people in the world with access to
-% the Apollo lander source code makes us a wow at parties'', by Zeus \etal.
-
-% You can handle this paper like any other.  Don't write ``We show how to
-% improve our previous work [Anonymous, 1968].  This time we tested the
-% algorithm on a lunar lander [name of lander removed for blind review]''.
-% That would be silly, and would immediately identify the authors. Instead
-% write the following:
-% \begin{quotation}
-% \noindent
-%    We describe a system for zero-g frobnication.  This
-%    system is new because it handles the following cases:
-%    A, B.  Previous systems [Zeus et al. 1968] didn't
-%    handle case B properly.  Ours handles it by including
-%    a foo term in the bar integral.
-
-%    ...
-
-%    The proposed system was integrated with the Apollo
-%    lunar lander, and went all the way to the moon, don't
-%    you know.  It displayed the following behaviours
-%    which show how well we solved cases A and B: ...
-% \end{quotation}
-% As you can see, the above text follows standard scientific convention,
-% reads better than the first version, and does not explicitly name you as
-% the authors.  A reviewer might think it likely that the new paper was
-% written by Zeus \etal, but cannot make any decision based on that guess.
-% He or she would have to be sure that no other authors could have been
-% contracted to solve problem B.
-% \medskip
-
 % \noindent
 % FAQ\medskip\\
 % {\bf Q:} Are acknowledgements OK?\\
@@ -453,38 +457,6 @@ A summary of each authors contributions are provided in Table \ref{tab:contribut
 % \label{fig:long}
 % \label{fig:onecol}
 % \end{figure}
-
-% \subsection{Miscellaneous}
-
-% \noindent
-% Compare the following:\\
-% \begin{tabular}{ll}
-%  \verb'$conf_a$' &  $conf_a$ \\
-%  \verb'$\mathit{conf}_a$' & $\mathit{conf}_a$
-% \end{tabular}\\
-% See The \TeX book, p165.
-
-% The space after \eg, meaning ``for example'', should not be a
-% sentence-ending space. So \eg is correct, {\em e.g.} is not.  The provided
-% \verb'\eg' macro takes care of this.
-
-% When citing a multi-author paper, you may save space by using ``et alia'',
-% shortened to ``\etal'' (not ``{\em et.\ al.}'' as ``{\em et}'' is a complete word.)
-% However, use it only when there are three or more authors.  Thus, the
-% following is correct: ``
-%    Frobnication has been trendy lately.
-%    It was introduced by Alpher~\cite{Alpher02}, and subsequently developed by
-%    Alpher and Fotheringham-Smythe~\cite{Alpher03}, and Alpher \etal~\cite{Alpher04}.''
-
-% This is incorrect: ``... subsequently developed by Alpher \etal~\cite{Alpher03} ...''
-% because reference~\cite{Alpher03} has just two authors.  If you use the
-% \verb'\etal' macro provided, then you need not worry about double periods
-% when used at the end of a sentence as in Alpher \etal.
-
-% For this citation style, keep multiple citations in numerical (not
-% chronological) order, so prefer \cite{Alpher03,Alpher02,Authors14} to
-% \cite{Alpher02,Alpher03,Authors14}.
-
 
 % \begin{figure*}
 % \begin{center}
@@ -518,116 +490,7 @@ A summary of each authors contributions are provided in Table \ref{tab:contribut
 
 
 % %-------------------------------------------------------------------------
-% \subsection{Type-style and fonts}
-
-% Wherever Times is specified, Times Roman may also be used. If neither is
-% available on your word processor, please use the font closest in
-% appearance to Times to which you have access.
-
-% MAIN TITLE. Center the title 1-3/8 inches (3.49 cm) from the top edge of
-% the first page. The title should be in Times 14-point, boldface type.
-% Capitalize the first letter of nouns, pronouns, verbs, adjectives, and
-% adverbs; do not capitalize articles, coordinate conjunctions, or
-% prepositions (unless the title begins with such a word). Leave two blank
-% lines after the title.
-
-% AUTHOR NAME(s) and AFFILIATION(s) are to be centered beneath the title
-% and printed in Times 12-point, non-boldface type. This information is to
-% be followed by two blank lines.
-
-% The ABSTRACT and MAIN TEXT are to be in a two-column format.
-
-% MAIN TEXT. Type main text in 10-point Times, single-spaced. Do NOT use
-% double-spacing. All paragraphs should be indented 1 pica (approx. 1/6
-% inch or 0.422 cm). Make sure your text is fully justified---that is,
-% flush left and flush right. Please do not place any additional blank
-% lines between paragraphs.
-
-% Figure and table captions should be 9-point Roman type as in
-% Figures~\ref{fig:onecol} and~\ref{fig:short}.  Short captions should be centred.
-
-% \noindent Callouts should be 9-point Helvetica, non-boldface type.
-% Initially capitalize only the first word of section titles and first-,
-% second-, and third-order headings.
-
-% FIRST-ORDER HEADINGS. (For example, {\large \bf 1. Introduction})
-% should be Times 12-point boldface, initially capitalized, flush left,
-% with one blank line before, and one blank line after.
-
-% SECOND-ORDER HEADINGS. (For example, { \bf 1.1. Database elements})
-% should be Times 11-point boldface, initially capitalized, flush left,
-% with one blank line before, and one after. If you require a third-order
-% heading (we discourage it), use 10-point Times, boldface, initially
-% capitalized, flush left, preceded by one blank line, followed by a period
-% and your text on the same line.
-
-% %-------------------------------------------------------------------------
-% \subsection{Footnotes}
-
-% Please use footnotes\footnote {This is what a footnote looks like.  It
-% often distracts the reader from the main flow of the argument.} sparingly.
-% Indeed, try to avoid footnotes altogether and include necessary peripheral
-% observations in
-% the text (within parentheses, if you prefer, as in this sentence).  If you
-% wish to use a footnote, place it at the bottom of the column on the page on
-% which it is referenced. Use Times 8-point type, single-spaced.
-
-
-% %-------------------------------------------------------------------------
-% \subsection{References}
-
-% List and number all bibliographical references in 9-point Times,
-% single-spaced, at the end of your paper. When referenced in the text,
-% enclose the citation number in square brackets, for
-% example~\cite{Authors14}.  Where appropriate, include the name(s) of
-% editors of referenced books.
-
-% \begin{table}
-% \begin{center}
-% \begin{tabular}{|l|c|}
-% \hline
-% Method & Frobnability \\
-% \hline\hline
-% Theirs & Frumpy \\
-% Yours & Frobbly \\
-% Ours & Makes one's heart Frob\\
-% \hline
-% \end{tabular}
-% \end{center}
-% \caption{Results.   Ours is better.}
-% \end{table}
-
-% %-------------------------------------------------------------------------
-% \subsection{Illustrations, graphs, and photographs}
-
-% All graphics should be centered.  Please ensure that any point you wish to
-% make is resolvable in a printed copy of the paper.  Resize fonts in figures
-% to match the font in the body text, and choose line widths which render
-% effectively in print.  Many readers (and reviewers), even of an electronic
-% copy, will choose to print your paper in order to read it.  You cannot
-% insist that they do otherwise, and therefore must not assume that they can
-% zoom in to see tiny details on a graphic.
-
-% When placing figures in \LaTeX, it's almost always best to use
-% \verb+\includegraphics+, and to specify the  figure width as a multiple of
-% the line width as in the example below
-% {\small\begin{verbatim}
-%    \usepackage[dvips]{graphicx} ...
-%    \includegraphics[width=0.8\linewidth]
-%                    {myfile.eps}
-% \end{verbatim}
-% }
-
-
-% %-------------------------------------------------------------------------
-% \subsection{Color}
-
-% Please refer to the author guidelines on the CVPR 2020 web page for a discussion
-% of the use of color in your document.
-
-% %------------------------------------------------------------------------
-
-% %-------------------------------------------------------------------------
+------------------------------------------------------------
 
 
 \newpage
@@ -663,9 +526,9 @@ Jaden Zwicker & Default Model Experimentation \& Analysis &
 Performed various experiments on the 3 SmolLM2 models in their default configuration. Analyzed the results of these experiments to compare and contrast them with the larger LLMs and to set a baseline of performance before fine tuning. 
 \\
 
-Houshmand Abbaszadeh & Analysis \& Comparison of Various ML Techniques & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
+Houshmand Abbaszadeh & Analysis \& Comparison of Various ML Techniques & Performed an experiment to compare different ML techniques for sentiment analysis applications, successfully identifying alternative models to LLMs for sentiment analysis. Analyzed and documented the results of the experiment, as well as contributing to the abstract, introduction, and approach sections of the paper.  \\
 
-Team Member 3 & Implementation and Analysis & Trained the LSTM of the encoder and analyzed the results. Analyzed effect of number of nodes in hidden state.  Implemented Convolutional LSTM. \\
+Brieuc Popper & SmolLM finetuning, general coding tasks & Designed and ran the fine-tuning experiments with SmolLM-135M. Helped team setup on PACE ICE GPUs and all around Python Code with \textit{transformers} library to deal with LLMs \\
 
 \hline
 \end{tabular}
