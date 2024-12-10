@@ -116,7 +116,7 @@ The dataset chosen to test the various models sentiment analysis capabilities wa
 
 
 \subsection{SmolLM Choice}
-Talk about why we chose the models in more detail, ie small and can run on phone and open source. Cite this \cite{hf-smollm-usecase}.
+Talk about why we chose the models in more detail for fine tuning and beating LLMs, ie small and can run on phone and open source. Cite this \cite{hf-smollm-usecase}.
 Also, mention why 135M over the other models
 
 \textbf{Important: Mention any code repositories (with citations) or other sources that you used, and specifically what changes you made to them for your project. }
@@ -155,6 +155,9 @@ Movie Review: This move was so good I would recommend to all my friends! \n Only
 \end{table*}
 
 
+\subsection{Gathering Data on LLMs and ML techniques}
+
+
 \subsection{Fine-tuning SmolLM-135M}
 
 
@@ -166,15 +169,6 @@ Movie Review: This move was so good I would recommend to all my friends! \n Only
 
 
 \section{Experiments and Results}
-\textbf{(10 points) How did you measure success? What experiments were used? What were the results, both quantitative and qualitative? Did you succeed? Did you fail? Why? Justify your reasons with arguments supported by evidence and data.}
-
-\textbf{Important: This section should be rigorous and thorough. Present detailed information about decision you made, why you made them, and any evidence/experimentation to back them up. This is especially true if you leveraged existing architectures, pre-trained models, and code (i.e. do not just show results of fine-tuning a pre-trained model without any analysis, claims/evidence, and conclusions, as that tends to not make a strong project). }
-
-\subsection{Testing Default SmolLM Models}
-
-
-
-
 % To calculate the values of accuracy, recall, specificity, precision, and F-score, you need the confusion matrix or the key components: True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN). Here's how each metric is calculated:
 
 % 1. **Accuracy**: The proportion of correctly classified instances (both positive and negative) out of all instances.
@@ -203,34 +197,15 @@ Movie Review: This move was so good I would recommend to all my friends! \n Only
 %    \]
 
 
-\begin{table*}
-\begin{center}
-% shrinks font as needed to fit the table
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
-\hline
-Model & Accuracy & Recall & Specificity & Precision & F-Score & \% Positive & \% Negative & \# Unknown \\
-\hline\hline
-SmolLM2-135M Zero-Shot   & 0.50 & 0.01 & 1.00 & 0.78 & 0.02 & 00.78\%  & 99.22\% & 2993  \\
+\textbf{(10 points) How did you measure success? What experiments were used? What were the results, both quantitative and qualitative? Did you succeed? Did you fail? Why? Justify your reasons with arguments supported by evidence and data.}
 
-SmolLM2-360M Zero-Shot   & 0.56 & 1.00 & 0.11 & 0.53 & 0.69 & 94.26\% & 05.74\%  & 2     \\
-
-SmolLM2-1.7B ~ Zero-Shot & 0.72 & 0.99 & 0.45 & 0.65 & 0.78 & 77.01\% & 22.99\% & 14    \\
-
-SmolLM2-135M Few-Shot    & 0.59 & 0.80 & 0.37 & 0.56 & 0.66 & 71.86\% & 28.14\% & 0     \\
-
-SmolLM2-360M Few-Shot    & 0.66 & 0.99 & 0.33 & 0.60 & 0.75 & 82.74\% & 17.26\% & 0     \\
-
-SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% & 0     \\
-\hline
-\end{tabular}
-}
-\end{center}
-\caption{Large Model's Performance on IMDb Dataset}
-\label{tab:contributions}
-\end{table*}
+\textbf{Important: This section should be rigorous and thorough. Present detailed information about decision you made, why you made them, and any evidence/experimentation to back them up. This is especially true if you leveraged existing architectures, pre-trained models, and code (i.e. do not just show results of fine-tuning a pre-trained model without any analysis, claims/evidence, and conclusions, as that tends to not make a strong project). }
 
 
+
+
+\subsection{Testing Default SmolLM Models}
+Results are given in Tables \ref{tab:default-smollm-metrics} and \ref{tab:default-smollm-times}. 
 
 \begin{table*}
 \begin{center}
@@ -255,13 +230,11 @@ SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% 
 \end{tabular}
 }
 \end{center}
-\caption{Default SmolLM2 Model's Results on Test Dataset}
-\label{tab:contributions}
+\caption{Default SmolLM2 Model's Performance Metrics on IMDb Test Dataset}
+\label{tab:default-smollm-metrics}
 \end{table*}
 
-\textbf{SmolLM2-135M Zero-Shot adjusted accuracy when counting unknown predictins as false answers is 0.38}
-
-
+\textbf{SmolLM2-135M Zero-Shot adjusted accuracy when counting unknown predictions as false answers is 0.38}
 
 
 
@@ -286,12 +259,43 @@ SmolLM2-1.7B ~ Few-Shot  & 333.55 & 0.01    \\
 \end{tabular}
 \end{center}
 \caption{Default SmolLM2 Model's Inference Times on Test Dataset}
-\label{tab:contributions}
+\label{tab:default-smollm-times}
 \end{table*}
+
+
+
+
 
 
 \subsection{Comparison Between LLMs, Traditional ML, and SmolLMs}
 Experiment 4
+
+\begin{table*}
+\begin{center}
+% shrinks font as needed to fit the table
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+\hline
+Model & Accuracy & Recall & Specificity & Precision & F-Score & \% Positive & \% Negative & \# Unknown \\
+\hline\hline
+SmolLM2-135M Zero-Shot   & 0.50 & 0.01 & 1.00 & 0.78 & 0.02 & 00.78\%  & 99.22\% & 2993  \\
+
+SmolLM2-360M Zero-Shot   & 0.56 & 1.00 & 0.11 & 0.53 & 0.69 & 94.26\% & 05.74\%  & 2     \\
+
+SmolLM2-1.7B ~ Zero-Shot & 0.72 & 0.99 & 0.45 & 0.65 & 0.78 & 77.01\% & 22.99\% & 14    \\
+
+SmolLM2-135M Few-Shot    & 0.59 & 0.80 & 0.37 & 0.56 & 0.66 & 71.86\% & 28.14\% & 0     \\
+
+SmolLM2-360M Few-Shot    & 0.66 & 0.99 & 0.33 & 0.60 & 0.75 & 82.74\% & 17.26\% & 0     \\
+
+SmolLM2-1.7B ~ Few-Shot  & 0.81 & 0.99 & 0.62 & 0.73 & 0.84 & 68.48\% & 31.52\% & 0     \\
+\hline
+\end{tabular}
+}
+\end{center}
+\caption{Large Model's Performance on IMDb Dataset}
+\label{tab:large-models-metrics}
+\end{table*}
 
 
 
